@@ -675,11 +675,13 @@ void banUser()
     }
 
     int userBanned = 0;
+    int track_user = 0;
 
     for (int i = 0; i < userCount; i++)
     {
         if (strcmp(users[i].name, username) == 0)
         {
+            track_user = 1;
             // Check if the user is an admin
             if (users[i].isAdmin == 1)
             {
@@ -697,14 +699,17 @@ void banUser()
                 userBanned = 1;
             }
         }
-        else
-        {
-            system("cls");
-            printf("The user %s does not exit.\n", username);
-        }
 
         // Copy other records to the temporary file
         fprintf(tempFile, "%s %s %d %d %d\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan);
+    }
+
+    if (track_user == 0)
+    {
+        system("cls");
+        printf("User not found\n");
+        remove("tempfile.txt");
+        return;
     }
 
     fclose(tempFile);
@@ -731,52 +736,65 @@ void banUser()
 void unbanUser()
 {
     char username[50];
-
     system("cls");
-
-    printf("---Unban User---\n\n");
-
-    printf("Enter the username to unban : ");
+    printf("<---Unban User--->\n\n");
+    printf("Enter email to unban : ");
     scanf(" %[^\n]", username);
+    FILE *tempFile = fopen("tempfile.txt", "w");
+    if (tempFile == NULL)
+    {
+        system("cls");
+        printf("Error creating temporary file.\n");
+        return;
+    }
 
+    int userUnbanned = 0;
+    int search_tracker = 0;
     for (int i = 0; i < userCount; i++)
     {
+
         if (strcmp(users[i].name, username) == 0)
         {
-            // Check if the user to be unbanned is currently banned
+            search_tracker = 1;
             if (users[i].isBan == 1)
             {
-                users[i].isBan = 0;
-
                 system("cls");
-                printf("The user %s has been unbanned.\n", username);
-
-                // Update the file to reflect the changes
-                FILE *file = fopen(testfile, "w");
-                if (file == NULL)
-                {
-                    printf("Error opening file: %s\n", testfile);
-                    return;
-                }
-
-                // Rewrite the user data to the file
-                for (int j = 0; j < userCount; j++)
-                {
-                    fprintf(file, "%s %s %d %d %d\n", users[j].name, users[j].password, users[j].credits, users[j].isAdmin, users[j].isBan);
-                }
-
-                fclose(file);
+                users[i].isBan = 0;
+                printf("The user is successfully unbanned.\n");
+                userUnbanned = 1;
             }
             else
             {
                 system("cls");
-                printf("The user %s is not currently banned.\n", username);
+                printf("The user is not banned yet!\n");
             }
-            return;
+        }
+        fprintf(tempFile, "%s %s %d %d %d\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan);
+    }
+    fclose(tempFile);
+    if (search_tracker == 0)
+    {
+        system("cls");
+        printf("User not found!\n");
+        remove("tempfile.txt");
+    }
+    if (userUnbanned)
+    {
+        // Replace the original file with the temporary file only if a user was banned
+        if (remove(testfile) == 0 && rename("tempfile.txt", testfile) == 0)
+        {
+            printf("User data updated successfully.\n");
+        }
+        else
+        {
+            printf("Error updating user data.\n");
         }
     }
-    system("cls");
-    printf("User %s not found.\n", username);
+    else
+    {
+        // No user was banned, remove the temporary file
+        remove("tempfile.txt");
+    }
 }
 
 int isNumeric(const char *str)
