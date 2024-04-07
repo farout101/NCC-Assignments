@@ -16,6 +16,16 @@ typedef struct {
     struct Node* top; // Pointer to the top node of the stack
 } Stack;
 
+// Structure for Queue
+struct QueueNode {
+    int data;
+    struct QueueNode *next;
+};
+
+struct Queue {
+    struct QueueNode *front, *rear;
+};
+
 // Functions for linked List
 struct Node* createNode(int data);
 void insertAtBeginning(struct Node** head, int data);
@@ -32,5 +42,14 @@ void push(Stack *stack, int value);
 int pop(Stack *stack);
 int peek(Stack *stack);
 void deleteStack(Stack *stack);
+
+// Functions for Queue (Linked List Structure)
+struct QueueNode *newNode(int data);
+struct Queue *createQueue();
+int isEmptyQueue(struct Queue *queue);
+void enqueue(struct Queue *queue, int data);
+int dequeue(struct Queue *queue);
+void emptyQueue(struct Queue *queue);
+void displayQueue(struct Queue *queue);
 
 #endif
