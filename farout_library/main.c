@@ -13,6 +13,8 @@ int main() {
     push(&stack, 30);
     push(&stack, 40);
     printf("Top element of stack: %d\n", peek(&stack));
+
+    // The example usage for the Queue (linked list) is not written yet
     
     return 0;
 }
