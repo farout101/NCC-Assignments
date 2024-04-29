@@ -111,7 +111,7 @@ int main()
                     {
                         printf("--Admin Menu--\n\n");
 
-                        printf("Current credit : %d\n", users[loggedInUserIndex].credits);
+                        printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
                         printf("\n1. to share\n2. to delete user\n3. to ban user\n4. to unban user\n5. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
@@ -323,12 +323,12 @@ void loadUserData(const char *file_name)
     while (fgets(buffer, sizeof(buffer), file) != NULL)
     {
         // Handle user registration record
-        if (sscanf(buffer, "%s %s %lf %d %d %s", users[userCount].name, users[userCount].password, &users[userCount].credits, &users[userCount].isAdmin, &users[userCount].isBan, users[userCount].phoneNo) != 6)
+        if (sscanf(buffer, "%s %s %lf %d %d %s\n", users[userCount].name, users[userCount].password, &users[userCount].credits, &users[userCount].isAdmin, &users[userCount].isBan, users[userCount].phoneNo) != 6)
         {
             printf("Error reading user registration record.\n");
             break;
         }
-
+        
         userCount++;
 
         if (userCount >= sizeof(users) / sizeof(users[0]))
@@ -337,6 +337,9 @@ void loadUserData(const char *file_name)
             break;
         }
     }
+
+    printf("%d users loaded.\n", userCount);
+
     fclose(file);
 }
 
@@ -645,26 +648,26 @@ void registration()
                     users[userCount].isAdmin = 0;
                 }
 
-                // Set the initial credits based on admin status
-                users[userCount].credits = (users[userCount].isAdmin == 1 || users[userCount].isAdmin == 2) ? INITIAL_ADMIN_CREDITS : INITIAL_CREDITS;
-
                 if (users[userCount].isAdmin == 1)
                 {
+                    users[userCount].credits = INITIAL_ADMIN_CREDITS;
                     system("cls");
                     printf("Successfully Registered as an Admin!!!\n");
                 }
                 else if (users[userCount].isAdmin == 2)
                 {
+                    users[userCount].credits = INITIAL_ADMIN_CREDITS;
                     system("cls");
                     printf("You are the Owner of this app.\n");
                 }
                 else
                 {
+                    users[userCount].credits = INITIAL_CREDITS;
                     system("cls");
                     printf("Successfully Registered!!!\n");
                 }
 
-                printf("Current credit of [%s] : %d\n", users[userCount].name, users[userCount].credits);
+                printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
 
                 appendFile(testfile, &users[userCount]);
                 userCount++;
@@ -967,7 +970,7 @@ int isValidPhoneNumber(const char *phoneNumber)
     {
         if (!isdigit(phoneNumber[i]))
         {
-            return 0; 
+            return 0;
         }
     }
 
