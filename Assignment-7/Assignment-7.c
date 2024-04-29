@@ -28,7 +28,7 @@ struct Transition
 };
 
 char transitionfile[20] = "transition.txt";
-char testfile[20] = "data.txt";
+char datafile[20] = "data.txt";
 
 struct User users[50];
 struct Transition transitions[500];
@@ -62,18 +62,18 @@ int main()
     char choice[50];
 
     // Load user data from the file
-    loadUserData(testfile);
+    loadUserData(datafile);
 
     // Load transition data from the file
     loadTransitionData(transitionfile);
 
-    if (access(testfile, F_OK) != -1 && access(transitionfile, F_OK) != -1)
+    if (access(datafile, F_OK) != -1 && access(transitionfile, F_OK) != -1)
     {
         printf("The data files are ready...\n");
     }
     else
     {
-        createFile(testfile);
+        createFile(datafile);
         createFile(transitionfile);
     }
 
@@ -117,6 +117,8 @@ int main()
 
                         if (strcmp(option, "1") == 0)
                         {
+                            system("cls");
+                            printf("--Transition--\n\n");
                             char recipient[50];
                             printf("Enter the username to share credits with: ");
                             scanf(" %[^\n]", recipient);
@@ -328,7 +330,7 @@ void loadUserData(const char *file_name)
             printf("Error reading user registration record.\n");
             break;
         }
-        
+
         userCount++;
 
         if (userCount >= sizeof(users) / sizeof(users[0]))
@@ -486,7 +488,7 @@ void shareCredits(struct User *sender, struct User *receiver)
         sender->credits -= OwnerBouns;
         users[0].credits += OwnerBouns;
 
-        FILE *file = fopen(testfile, "r");
+        FILE *file = fopen(datafile, "r");
         FILE *tempFile = fopen("tempfile.txt", "w");
 
         if (file == NULL || tempFile == NULL)
@@ -515,7 +517,7 @@ void shareCredits(struct User *sender, struct User *receiver)
         fclose(file);
         fclose(tempFile);
 
-        if (remove(testfile) == 0 && rename("tempfile.txt", testfile) == 0)
+        if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
         {
             printf("User data updated successfully.\n");
         }
@@ -669,7 +671,7 @@ void registration()
 
                 printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
 
-                appendFile(testfile, &users[userCount]);
+                appendFile(datafile, &users[userCount]);
                 userCount++;
             }
             else
@@ -769,7 +771,7 @@ void deleteUser()
             userCount--;
 
             // Update the file with the modified user data
-            FILE *file = fopen(testfile, "w");
+            FILE *file = fopen(datafile, "w");
 
             if (file == NULL)
             {
@@ -846,14 +848,14 @@ void banUser()
         }
 
         // Copy other records to the temporary file
-        fprintf(tempFile, "%s %s %d %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
+        fprintf(tempFile, "%s %s %lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
     }
 
     if (track_user == 0)
     {
         system("cls");
         printf("User not found\n");
-        remove("tempfile.txt");
+        remove(datafile);
         return;
     }
 
@@ -862,7 +864,7 @@ void banUser()
     if (userBanned)
     {
         // Replace the original file with the temporary file only if a user was banned
-        if (remove(testfile) == 0 && rename("tempfile.txt", testfile) == 0)
+        if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
         {
             printf("User data updated successfully.\n");
         }
@@ -914,7 +916,7 @@ void unbanUser()
                 printf("The user is not banned yet!\n");
             }
         }
-        fprintf(tempFile, "%s %s %.2lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
+        fprintf(tempFile, "%s %s %lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
     }
     fclose(tempFile);
     if (search_tracker == 0)
@@ -926,7 +928,7 @@ void unbanUser()
     if (userUnbanned)
     {
         // Replace the original file with the temporary file only if a user was banned
-        if (remove(testfile) == 0 && rename("tempfile.txt", testfile) == 0)
+        if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
         {
             printf("User data updated successfully.\n");
         }
